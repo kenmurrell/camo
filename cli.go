@@ -9,27 +9,29 @@ import (
 
 func run() {
 	encodeCmd := flag.NewFlagSet("encode", flag.ExitOnError)
+	eModePtr := encodeCmd.Bool("blue", false, "Encode only in blue pixels.")
 	hostPtr := encodeCmd.String("host", "", "The image to host a hidden file.")
 	hidePtr := encodeCmd.String("hide", "", "The image to hide.")
 
 	decodeCmd := flag.NewFlagSet("decode", flag.ExitOnError)
+	dModePtr := decodeCmd.Bool("blue", false, "Decode only the blue pixels.")
 	hostedPtr := decodeCmd.String("host", "", "The image that contains a hidden file.")
 	outputPtr := decodeCmd.String("output", "", "The name of the output file.")
 
 	switch os.Args[1] {
 	case "encode":
 		encodeCmd.Parse(os.Args[2:])
-		encodeWork(*hostPtr, *hidePtr)
+		encodeWork(*hostPtr, *hidePtr, *eModePtr)
 	case "decode":
 		decodeCmd.Parse(os.Args[2:])
-		decodeWork(*hostedPtr, *outputPtr)
+		decodeWork(*hostedPtr, *outputPtr, *dModePtr)
 	default:
 		fmt.Println("Use \"encode\" to encode images, \"decode\" to decode them.\nRun \"encode -h\" to show flags.")
 		os.Exit(1)
 	}
 }
 
-func encodeWork(hostFileName string, hideFileName string) {
+func encodeWork(hostFileName string, hideFileName string, modeB bool) {
 	hostFile, err := loadFile(hostFileName)
 	_printAndExit(err)
 	defer hostFile.Close()
@@ -40,18 +42,25 @@ func encodeWork(hostFileName string, hideFileName string) {
 	hostedFile, err := os.Create(hostedFileName)
 	_printAndExit(err)
 	defer hostedFile.Close()
-
-	err = steganography.Encode(hostFile, hideFile, hostedFile)
+	mode := steganography.AllRGBA
+	if modeB { 
+		mode = steganography.BlueRGBA
+	}
+	err = steganography.Encode(hostFile, hideFile, hostedFile, mode)
 	_printAndExit(err)
 }
 
-func decodeWork(hostFileName string, rsltFileName string) {
+func decodeWork(hostFileName string, rsltFileName string, modeB bool) {
 	hostFile, err := loadFile(hostFileName)
 	_printAndExit(err)
 	defer hostFile.Close()
 	rsltFile, err := os.Create(rsltFileName)
 	_printAndExit(err)
 	defer rsltFile.Close()
-	err = steganography.Decode(hostFile, rsltFile)
+	mode := steganography.AllRGBA
+	if modeB { 
+		mode = steganography.BlueRGBA
+	}
+	err = steganography.Decode(hostFile, rsltFile, mode)
 	_printAndExit(err)
 }

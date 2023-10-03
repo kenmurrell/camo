@@ -25,12 +25,12 @@ func TestEncodeAndDecode(t *testing.T) {
 	rslt1, _ := os.Create(rslt1filename)
 	defer rslt1.Close()
 
-	err := steganography.Encode(host1, hide1, cmbn1)
+	err := steganography.Encode(host1, hide1, cmbn1, steganography.AllRGBA)
     if err != nil {
         t.Errorf("Error encountered encoding: %s", err.Error())
     }
 	cmbn1.Seek(0, io.SeekStart)
-	err = steganography.Decode(cmbn1, rslt1)
+	err = steganography.Decode(cmbn1, rslt1, steganography.AllRGBA)
     if err != nil {
         t.Errorf("Error encountered decoding: %s", err.Error())
     }
