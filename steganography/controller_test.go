@@ -10,27 +10,40 @@ import (
 	"testing"
 )
 
-const host1filename string = "test_images/host1.png"
-const hide1filename string = "test_images/hide1.jpg"
-const cmbn1filename string = "test_images/cmbn1.png"
-const rslt1filename string = "test_images/rslt1.jpg"
+var host1 *os.File
+var hide1 *os.File
+var cmbn1 *os.File
+var rslt1 *os.File
 
-func TestEncodeAndDecode(t *testing.T) {
-	host1, _ := os.Open(host1filename)
+func init() {
+	host1, _ = os.Open("test_images/host1.png")
+	hide1, _ = os.Open("test_images/hide1.jpg")
+	cmbn1, _ = os.Create("test_images/cmbn1.png")
+	rslt1, _ = os.Create("test_images/rslt1.jpg")
+}
+func Shutdown() {
 	defer host1.Close()
-	hide1, _ := os.Open(hide1filename)
 	defer hide1.Close()
-	cmbn1, _ := os.Create(cmbn1filename)
 	defer cmbn1.Close()
-	rslt1, _ := os.Create(rslt1filename)
 	defer rslt1.Close()
+}
 
-	err := steganography.Encode(host1, hide1, cmbn1, steganography.AllRGBA)
+func TestAllRgbaEncoding(t *testing.T) {
+	encodeAndDecode(t, steganography.AllRGBA)
+}
+
+func TestOnlyBlueEncoding(t *testing.T) {
+	encodeAndDecode(t, steganography.BlueRGBA)
+}
+
+func encodeAndDecode(t *testing.T, m steganography.Mode) {
+	defer Shutdown()
+	err := steganography.Encode(host1, hide1, cmbn1, m)
     if err != nil {
         t.Errorf("Error encountered encoding: %s", err.Error())
     }
 	cmbn1.Seek(0, io.SeekStart)
-	err = steganography.Decode(cmbn1, rslt1, steganography.AllRGBA)
+	err = steganography.Decode(cmbn1, rslt1, m)
     if err != nil {
         t.Errorf("Error encountered decoding: %s", err.Error())
     }
