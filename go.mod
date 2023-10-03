@@ -1,3 +1,3 @@
-module github.com/camo
+module camo
 
 go 1.18

@@ -1,4 +1,4 @@
-package main
+package steganography
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func encode(hostFile *os.File, hideFile *os.File, hostedFile *os.File) error {
+func Encode(hostFile *os.File, hideFile *os.File, hostedFile *os.File) error {
 	fmt.Print("Encoding..")
 	hostIm, _, err := image.Decode(hostFile)
 	if err != nil {
@@ -62,11 +62,11 @@ func encode(hostFile *os.File, hideFile *os.File, hostedFile *os.File) error {
 	return nil
 }
 
-func decode(hostFile *os.File, hideFileName string) error {
+func Decode(hostFile *os.File, outputFile *os.File) error {
 	fmt.Print("Decoding..")
 	hostIm, _, err := image.Decode(hostFile)
 	if err != nil {
-		return fmt.Errorf("ERROR: image cannot be decoded.")
+		return fmt.Errorf("ERROR: image cannot be decoded %s", err.Error())
 	}
 	bounds := hostIm.Bounds()
 	capacity := int((bounds.Max.Y - bounds.Min.Y) * (bounds.Max.X - bounds.Min.X) / 8)
@@ -91,8 +91,7 @@ func decode(hostFile *os.File, hideFileName string) error {
 			}
 		}
 	}
-
-	err = os.WriteFile(hideFileName, hideArr, 0666)
+	_, err = outputFile.Write(hideArr)
 	if err != nil {
 		return err
 	}

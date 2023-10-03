@@ -1,6 +1,7 @@
 package main
 
 import (
+	steganography "camo/steganography"
 	"flag"
 	"fmt"
 	"os"
@@ -30,24 +31,27 @@ func run() {
 
 func encodeWork(hostFileName string, hideFileName string) {
 	hostFile, err := loadFile(hostFileName)
+	_printAndExit(err)
 	defer hostFile.Close()
-	_printAndExit(err)
 	hideFile, err := loadFile(hideFileName)
-	defer hideFile.Close()
 	_printAndExit(err)
+	defer hideFile.Close()
 	hostedFileName := hostFileName[:len(hostFileName)-4] + "_hosted.png"
 	hostedFile, err := os.Create(hostedFileName)
-	defer hostedFile.Close()
 	_printAndExit(err)
+	defer hostedFile.Close()
 
-	err = encode(hostFile, hideFile, hostedFile)
+	err = steganography.Encode(hostFile, hideFile, hostedFile)
 	_printAndExit(err)
 }
 
-func decodeWork(hostFileName string, hideFileName string) {
+func decodeWork(hostFileName string, rsltFileName string) {
 	hostFile, err := loadFile(hostFileName)
 	_printAndExit(err)
 	defer hostFile.Close()
-	err = decode(hostFile, hideFileName)
+	rsltFile, err := os.Create(rsltFileName)
+	_printAndExit(err)
+	defer rsltFile.Close()
+	err = steganography.Decode(hostFile, rsltFile)
 	_printAndExit(err)
 }
