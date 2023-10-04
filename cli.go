@@ -35,30 +35,34 @@ func run() {
 
 func encodeWork(hostFileName string, hideFileName string, ro stg.RunOptions) {
 	hostFile, err := loadFile(hostFileName)
-	_printAndExit(err)
+	printAndExit(err)
 	defer hostFile.Close()
+	if !checkPNG(hostFile) {
+		fmt.Println("Only PNG files are supported as the host file!")
+		os.Exit(1)
+	}
 	hideFile, err := loadFile(hideFileName)
-	_printAndExit(err)
+	printAndExit(err)
 	defer hideFile.Close()
 	hostedFileName := hostFileName[:len(hostFileName)-4] + "_hosted.png"
 	hostedFile, err := os.Create(hostedFileName)
-	_printAndExit(err)
+	printAndExit(err)
 	defer hostedFile.Close()
 	ro.Print()
 	err = stg.Encode(hostFile, hideFile, hostedFile, ro)
-	_printAndExit(err)
+	printAndExit(err)
 }
 
 func decodeWork(hostFileName string, rsltFileName string, ro stg.RunOptions) {
 	hostFile, err := loadFile(hostFileName)
-	_printAndExit(err)
+	printAndExit(err)
 	defer hostFile.Close()
 	rsltFile, err := os.Create(rsltFileName)
-	_printAndExit(err)
+	printAndExit(err)
 	defer rsltFile.Close()
 	ro.Print()
 	err = stg.Decode(hostFile, rsltFile, ro)
-	_printAndExit(err)
+	printAndExit(err)
 }
 
 func buildRunOptions(eModePtr *bool, encrypt *bool) stg.RunOptions {

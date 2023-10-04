@@ -27,7 +27,7 @@ func (ro *RunOptions) Print(){
 	}
 	var modeStr string
 	switch ro.Mode {
-	case 0x9:
+	case 0x0:
 		modeStr = "BlueRGBA"
 	case 0x1:
 		modeStr = "AllRGBA"
