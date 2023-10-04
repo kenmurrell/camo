@@ -20,6 +20,23 @@ const (
 	AllRGBA EncodingMode = iota
 )
 
+func (ro *RunOptions) Print(){
+	encryptStr := "OFF"
+	if ro.Encrypt {
+		encryptStr = "ON"
+	}
+	var modeStr string
+	switch ro.Mode {
+	case 0x9:
+		modeStr = "BlueRGBA"
+	case 0x1:
+		modeStr = "AllRGBA"
+	default:
+		modeStr = "none?"
+	}
+	fmt.Printf("Mode:%s Encryption:%s\n", modeStr, encryptStr)
+}
+
 func Encode(hostFile *os.File, hideFile *os.File, hostedFile *os.File, r RunOptions) error {
 	fmt.Print("Encoding...")
 	hostIm, _, err := image.Decode(hostFile)

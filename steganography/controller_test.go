@@ -1,7 +1,7 @@
 package steganography_test
 
 import (
-	steganography "camo/steganography"
+	stg "camo/steganography"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
@@ -21,17 +21,10 @@ func init() {
 	cmbn1, _ = os.Create("test_images/cmbn1.png")
 	rslt1, _ = os.Create("test_images/rslt1.jpg")
 }
-func Shutdown() {
-	defer host1.Close()
-	defer hide1.Close()
-	defer cmbn1.Close()
-	defer rslt1.Close()
-}
 
 func TestEncryptionEncoding(t *testing.T) {
-	defer Shutdown()
-	r := steganography.RunOptions{
-		Mode: steganography.AllRGBA,
+	r := stg.RunOptions{
+		Mode: stg.AllRGBA,
 		Encrypt: true,
 	}
 	_ = encodeAndDecode(r)
@@ -40,9 +33,8 @@ func TestEncryptionEncoding(t *testing.T) {
 }
 
 func TestAllRgbaEncoding(t *testing.T) {
-	defer Shutdown()
-	r := steganography.RunOptions{
-		Mode: steganography.AllRGBA,
+	r := stg.RunOptions{
+		Mode: stg.AllRGBA,
 		Encrypt: false,
 	}
 	_ = encodeAndDecode(r)
@@ -50,22 +42,21 @@ func TestAllRgbaEncoding(t *testing.T) {
 }
 
 func TestOnlyBlueEncoding(t *testing.T) {
-	defer Shutdown()
-	r := steganography.RunOptions{
-		Mode: steganography.BlueRGBA,
+	r := stg.RunOptions{
+		Mode: stg.BlueRGBA,
 		Encrypt: false,
 	}
 	_ = encodeAndDecode(r)
 	compareFileHashes(t, hide1, rslt1)
 }
 
-func encodeAndDecode(r steganography.RunOptions) error {
-	err := steganography.Encode(host1, hide1, cmbn1, r)
+func encodeAndDecode(r stg.RunOptions) error {
+	err := stg.Encode(host1, hide1, cmbn1, r)
     if err != nil {
         return fmt.Errorf("Error encountered encoding: %s", err.Error())
     }
 	cmbn1.Seek(0, io.SeekStart)
-	err = steganography.Decode(cmbn1, rslt1, r)
+	err = stg.Decode(cmbn1, rslt1, r)
     if err != nil {
         return fmt.Errorf("Error encountered decoding: %s", err.Error())
     }
