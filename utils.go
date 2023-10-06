@@ -14,6 +14,9 @@ func printAndExit(err error) {
 }
 
 func loadFile(filepath string) (*os.File, error) {
+	if len(filepath) == 0 {
+		return nil, fmt.Errorf("ERROR: file path is empty")
+	}
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
 		return nil, fmt.Errorf("ERROR: file %s not found", filepath)
 	}
@@ -33,12 +36,10 @@ func checkPNG(file *os.File) bool {
 	}
 	file.Seek(0, io.SeekStart)
 	//TODO: make reflect.deepequal work here...
-	for i:=0; i<len(fsig); i++ {
+	for i := 0; i < len(fsig); i++ {
 		if pngsig[i] != fsig[i] {
 			return false
 		}
 	}
 	return true
 }
-
-
